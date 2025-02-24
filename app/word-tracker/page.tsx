@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 interface WordCount {
   word: string;
@@ -15,11 +22,14 @@ export default function WordTracker() {
   const [trackedWords, setTrackedWords] = useState<WordCount[]>([]);
   const [newWord, setNewWord] = useState("");
   const [transcript, setTranscript] = useState("");
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(
+    null
+  );
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
@@ -30,23 +40,24 @@ export default function WordTracker() {
           const latestResult = event.results[event.results.length - 1];
           if (!latestResult.isFinal) return; // Only process final results
           const latestTranscript = latestResult[0].transcript;
-          
+
           // Keep only a short preview of the transcript
-          setTranscript(prev => {
-            const words = prev.split(' ').slice(-10).join(' ') + ' ' + latestTranscript;
+          setTranscript((prev) => {
+            const words =
+              prev.split(" ").slice(-20).join(" ") + " " + latestTranscript;
             return words.trim();
           });
 
           // Count words in the latest transcript only
-          const words = latestTranscript.toLowerCase().split(' ');
-          setTrackedWords(currentTrackedWords => {
-            return currentTrackedWords.map(trackedWord => {
-              const wordCount = words.filter(word => 
-                word.trim() === trackedWord.word.toLowerCase()
+          const words = latestTranscript.toLowerCase().split(" ");
+          setTrackedWords((currentTrackedWords) => {
+            return currentTrackedWords.map((trackedWord) => {
+              const wordCount = words.filter(
+                (word) => word.trim() === trackedWord.word.toLowerCase()
               ).length;
               return {
                 ...trackedWord,
-                count: trackedWord.count + wordCount
+                count: trackedWord.count + wordCount,
               };
             });
           });
@@ -70,68 +81,95 @@ export default function WordTracker() {
   };
 
   const addWord = () => {
-    if (newWord.trim() && !trackedWords.some(w => w.word.toLowerCase() === newWord.toLowerCase())) {
+    if (
+      newWord.trim() &&
+      !trackedWords.some((w) => w.word.toLowerCase() === newWord.toLowerCase())
+    ) {
       setTrackedWords([...trackedWords, { word: newWord.trim(), count: 0 }]);
       setNewWord("");
     }
   };
 
   const removeWord = (wordToRemove: string) => {
-    setTrackedWords(trackedWords.filter(w => w.word !== wordToRemove));
+    setTrackedWords(trackedWords.filter((w) => w.word !== wordToRemove));
   };
 
+  // the page starts here
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Word Tracker</h1>
-      
-      <div className="flex gap-4 mb-6">
-        <Input
-          type="text"
-          value={newWord}
-          onChange={(e) => setNewWord(e.target.value)}
-          placeholder="Enter a word to track"
-          className="max-w-xs"
-        />
-        <Button onClick={addWord}>Add Word</Button>
-      </div>
+    <div className="p-4 mx-auto max-w-4xl">
+      {/* Page information */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="text-3xl">Word Tracker</CardTitle>
+          <CardDescription>
+            A utility that listens to your microphone and keeps track of how
+            many times you&apos;ve said a specific word.
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-      <Button
-        onClick={toggleListening}
-        variant={isListening ? "destructive" : "default"}
-        className="mb-6"
-      >
-        {isListening ? "Stop Listening" : "Start Listening"}
-      </Button>
+      {/* Configuration card */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Configuration</CardTitle>
+          <CardDescription>This is where you configure what words to listen for.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              value={newWord}
+              onChange={(e) => setNewWord(e.target.value)}
+              placeholder="Enter a word to track"
+            />
+            <Button onClick={addWord}>Add Word</Button>
+            <Button
+              onClick={toggleListening}
+              variant={isListening ? "destructive" : "default"}
+            >
+              {isListening ? "Stop Listening" : "Start Listening"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {isListening && (
-        <Card className="p-4 mb-6">
-          <h3 className="text-lg font-semibold mb-2">Live Transcript Preview</h3>
-          <p className="text-gray-600">
-            {transcript.split(' ').map((word, index) => {
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>Live Transcript Preview</CardTitle>
+            <CardDescription>
+              This is what we think you&apos;re saying.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm">
+            {transcript.split(" ").map((word, index) => {
               const isTracked = trackedWords.some(
-                tw => tw.word.toLowerCase() === word.toLowerCase()
+                (tw) => tw.word.toLowerCase() === word.toLowerCase()
               );
               return (
                 <span key={index}>
-                  <span className={isTracked ? 'bg-yellow-200 dark:bg-yellow-800' : ''}>
+                  <span
+                    className={
+                      isTracked ? "bg-yellow-200 dark:bg-yellow-800" : ""
+                    }
+                  >
                     {word}
-                  </span>
-                  {' '}
+                  </span>{" "}
                 </span>
               );
             }) || "Listening..."}
-          </p>
+          </CardContent>
         </Card>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {trackedWords.map((wordCount) => (
-          <Card key={wordCount.word} className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">{wordCount.word}</h3>
-                <p className="text-2xl">{wordCount.count}</p>
-              </div>
+          <Card key={wordCount.word}>
+            <CardContent>
+              <h3 className="text-lg font-semibold">{wordCount.word}</h3>
+              <p className="text-2xl">{wordCount.count}</p>
+            </CardContent>
+            <CardFooter>
               <Button
                 variant="ghost"
                 size="sm"
@@ -139,9 +177,9 @@ export default function WordTracker() {
               >
                 Remove
               </Button>
-            </div>
+            </CardFooter>
           </Card>
-        ))}      
+        ))}
       </div>
     </div>
   );
