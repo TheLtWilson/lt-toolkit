@@ -1,5 +1,73 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import ModeToggle from "@/components/ui/theme-switcher"
+import { NavigationMenu, NavigationMenuTrigger, NavigationMenuItem, NavigationMenuContent, NavigationMenuList, NavigationMenuLink, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
+
+const tools: { title: string, href: string, description: string }[] = [
+  { title: 'Chatvoice', href: '/chatvoice', description: 'Voice-enabled chat interface for natural conversations.' },
+  { title: 'Word Tracker', href: '/word-tracker', description: 'Track and analyze your vocabulary usage.' }
+]
+
+function NavMenu() {
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <Link href="https://ltwilson.tv" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Blog
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+              {tools.map((tool) => (
+                <ListItem
+                  key={tool.title}
+                  title={tool.title}
+                  href={tool.href}
+                >
+                  {tool.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  )
+}
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = "ListItem"
 
 export function Header() {
     return (
@@ -10,12 +78,7 @@ export function Header() {
               Lt. Toolkit
             </Link>
             <span className="flex gap-4 justify-center items-center">
-              <Link href="/chatvoice" className="text-sm hover:underline text-neutral-500">
-                Chatvoice
-              </Link>
-              <Link href="/word-tracker" className="text-sm hover:underline text-neutral-500">
-                Word Tracker
-              </Link>
+              <NavMenu />
               <ModeToggle />
             </span>
           </div>

@@ -1,38 +1,107 @@
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Link from "next/link";
-import { MessageSquare, BookOpen } from "lucide-react";
+import ToolCard from "@/components/toolcard";
+
+function QuickActions() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <ToolCard
+        name="Chatvoice"
+        description="Voice-enabled chat interface for natural conversations."
+        iconName="message-square"
+        href="/chatvoice"
+      />
+      <ToolCard
+        name="Word Tracker"
+        description="Track and analyze your vocabulary usage."
+        iconName="book-open"
+        href="/word-tracker"
+      />
+    </div>
+  );
+}
+
+function FeatureList() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl">FAQ</CardTitle>
+        <CardDescription>Learn more about this project.</CardDescription>
+      </CardHeader>
+      <CardContent className="mx-4 border rounded-lg">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>What is Lt. Toolkit?</AccordionTrigger>
+            <AccordionContent>
+              Lt. Toolkit is an assortment of local-first privacy oriented tools
+              that are built for my streams. Some tools are built for stream
+              ideas, and others are built with everybody in mind.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>
+              How does &quot;local-first&quot; work?
+            </AccordionTrigger>
+            <AccordionContent>
+              As of right now, all the tools listed on this page are interfaced
+              with anonymously, and data is stored in your browser. This means
+              that no sensitive data is sent to any server, period. In the
+              future, I want to create a bridge that runs on your own computer
+              that can be used to interface with more services without having to
+              worry about your data being sent to anyone.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger>Is it open sourced?</AccordionTrigger>
+            <AccordionContent>
+              Yes! Both the website and the (eventually) Toolkit Bridge are open
+              sourced. You can find the source code for both projects on{" "}
+              <Link href="https://github.com/theltwilson" className="underline">
+                my GitHub
+              </Link>
+              .
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Home() {
   return (
     <div className="p-4 mx-auto max-w-4xl">
-      <div className="pb-4">
-        <h1 className="text-4xl font-bold">Lt. Toolkit</h1>
-        <p className="text-muted-foreground">A collection of tools that I might need during my streams.</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link href="/chatvoice">
-          <Card className="p-6 hover:bg-muted/50 hover:scale-105 transition">
-            <div className="space-y-4">
-              <MessageSquare className="w-8 h-8" />
-              <div>
-                <h2 className="text-xl font-semibold">Chatvoice</h2>
-                <p className="text-sm text-muted-foreground">Voice-enabled chat interface for natural conversations.</p>
-              </div>
-            </div>
-          </Card>
-        </Link>
-        <Link href="/word-tracker">
-          <Card className="p-6 hover:bg-muted/50 hover:scale-105 transition">
-            <div className="space-y-4">
-              <BookOpen className="w-8 h-8" />
-              <div>
-                <h2 className="text-xl font-semibold">Word Tracker</h2>
-                <p className="text-sm text-muted-foreground">Track and analyze your vocabulary usage.</p>
-              </div>
-            </div>
-          </Card>
-        </Link>
-      </div>
+      {/* Page Title */}
+      <section id="hero">
+        <div className="py-15">
+          <div className="flex flex-col text-left items-start px-5 gap-2 md:text-center md:items-center md:px-10">
+            <h1 className="text-5xl lg:text-7xl font-bold">Lt. Toolkit</h1>
+            <p className="text-md lg:text-lg">
+              A <span className="text-pink-500 drop-shadow-xl font-semibold">privacy-first</span> collection of tools that I might need during my streams.
+            </p>
+          </div>
+        </div>
+      </section>
+      {/* Quick Actions */}
+      <section id="quick-actions">
+        <QuickActions />
+      </section>
+      {/* Feature List */}
+      <section id="feature-list">
+        <FeatureList />
+      </section>
     </div>
   );
 }
