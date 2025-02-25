@@ -5,11 +5,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import ModeToggle from "@/components/ui/theme-switcher"
 import { NavigationMenu, NavigationMenuTrigger, NavigationMenuItem, NavigationMenuContent, NavigationMenuList, NavigationMenuLink, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
-
-const tools: { title: string, href: string, description: string }[] = [
-  { title: 'Chatvoice', href: '/chatvoice', description: 'Voice-enabled chat interface for natural conversations.' },
-  { title: 'Word Tracker', href: '/word-tracker', description: 'Track and analyze your vocabulary usage.' }
-]
+import { Tool, Tools } from "@/app/consts"
 
 function NavMenu() {
   return (
@@ -26,10 +22,10 @@ function NavMenu() {
           <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-              {tools.map((tool) => (
+              {Tools.map((tool: Tool) => (
                 <ListItem
-                  key={tool.title}
-                  title={tool.title}
+                  key={tool.name}
+                  title={tool.name}
                   href={tool.href}
                 >
                   {tool.description}

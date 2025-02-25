@@ -13,22 +13,22 @@ import {
 } from "@/components/ui/accordion";
 import Link from "next/link";
 import ToolCard from "@/components/toolcard";
+import { Tool, Tools } from '@/app/consts'
 
 function QuickActions() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <ToolCard
-        name="Chatvoice"
-        description="Voice-enabled chat interface for natural conversations."
-        iconName="message-square"
-        href="/chatvoice"
-      />
-      <ToolCard
-        name="Word Tracker"
-        description="Track and analyze your vocabulary usage."
-        iconName="book-open"
-        href="/word-tracker"
-      />
+      {Tools.map((tool: Tool) => {
+        return (
+          <ToolCard
+            key={tool.name}
+            name={tool.name}
+            description={tool.description}
+            iconName={tool.icon}
+            href={tool.href}
+          />
+        );
+      })}
     </div>
   );
 }
