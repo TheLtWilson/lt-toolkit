@@ -3,18 +3,27 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TrashIcon } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 
 interface WordCount {
   word: string;
   count: number;
+  sessionCount: number;
 }
 
 export default function WordTracker() {
@@ -25,6 +34,25 @@ export default function WordTracker() {
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(
     null
   );
+
+  // Load tracked words from localStorage on component mount
+  useEffect(() => {
+    const savedWords = localStorage.getItem("trackedWords");
+    if (savedWords) {
+      const parsedWords = JSON.parse(savedWords);
+      // Initialize session counts to 0
+      setTrackedWords(parsedWords.map((word: WordCount) => ({ ...word, sessionCount: 0 })));
+    }
+  }, []);
+
+  // Save tracked words to localStorage whenever they change
+  useEffect(() => {
+    if (trackedWords.length > 0) {
+      // Save without session counts
+      const wordsToSave = trackedWords.map(({ word, count }) => ({ word, count }));
+      localStorage.setItem("trackedWords", JSON.stringify(wordsToSave));
+    }
+  }, [trackedWords]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -58,6 +86,7 @@ export default function WordTracker() {
               return {
                 ...trackedWord,
                 count: trackedWord.count + wordCount,
+                sessionCount: (trackedWord.sessionCount || 0) + wordCount,
               };
             });
           });
@@ -85,13 +114,17 @@ export default function WordTracker() {
       newWord.trim() &&
       !trackedWords.some((w) => w.word.toLowerCase() === newWord.toLowerCase())
     ) {
-      setTrackedWords([...trackedWords, { word: newWord.trim(), count: 0 }]);
+      setTrackedWords([...trackedWords, { word: newWord.trim(), count: 0, sessionCount: 0 }]);
       setNewWord("");
     }
   };
 
   const removeWord = (wordToRemove: string) => {
     setTrackedWords(trackedWords.filter((w) => w.word !== wordToRemove));
+    // If no words left, clear localStorage
+    if (trackedWords.length === 1) {
+      localStorage.removeItem("trackedWords");
+    }
   };
 
   // the page starts here
@@ -112,7 +145,9 @@ export default function WordTracker() {
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Configuration</CardTitle>
-          <CardDescription>This is where you configure what words to listen for.</CardDescription>
+          <CardDescription>
+            This is where you configure what words to listen for.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
@@ -162,25 +197,56 @@ export default function WordTracker() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {trackedWords.map((wordCount) => (
-          <Card key={wordCount.word}>
-            <CardContent>
-              <h3 className="text-lg font-semibold">{wordCount.word}</h3>
-              <p className="text-2xl">{wordCount.count}</p>
-            </CardContent>
-            <CardFooter>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeWord(wordCount.word)}
-              >
-                Remove
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {/* Tracked words table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tracked Words</CardTitle>
+          <CardDescription>
+            These are the words you are currently tracking.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-3/5">Word</TableHead>
+                <TableHead>Total Usage</TableHead>
+                <TableHead>Session Usage</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {trackedWords.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground p-4"
+                  >
+                    No words are being tracked. Add some words above to get
+                    started.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                trackedWords.map((wordCount) => (
+                  <TableRow key={wordCount.word}>
+                    <TableCell>{wordCount.word}</TableCell>
+                    <TableCell>{wordCount.count}</TableCell>
+                    <TableCell>{wordCount.sessionCount}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="destructive"
+                        onClick={() => removeWord(wordCount.word)}
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
