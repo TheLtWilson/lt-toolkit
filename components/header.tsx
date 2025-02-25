@@ -73,10 +73,8 @@ export function Header() {
             <Link href="/" className="font-bold">
               Lt. Toolkit
             </Link>
-            <span className="flex gap-4 justify-center items-center">
-              <NavMenu />
-              <ModeToggle />
-            </span>
+            <NavMenu />
+            <ModeToggle />
           </div>
         </div>
       </header>
