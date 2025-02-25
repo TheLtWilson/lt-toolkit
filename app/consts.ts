@@ -10,7 +10,7 @@ export type Tool = {
 export const Tools: Tool[] = [
     {
         name: "Chatvoice",
-        description: "Voice-enabled chat interface for natural conversations.",
+        description: "Give your Twitch chat vocal cords! For better or worse.",
         href: "/chatvoice",
         icon: "message-square",
     },
